@@ -13,6 +13,7 @@ interface GameHUDProps {
   capturedRed: Piece[];
   capturedBlack: Piece[];
   moveCount: number;
+  onOpenGameOverModal?: () => void;
 }
 
 const DIFFICULTY_NAMES: Record<AIDifficulty, string> = {
@@ -32,6 +33,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   capturedRed,
   capturedBlack,
   moveCount,
+  onOpenGameOverModal,
 }) => {
   return (
     <div className="w-full bg-stone-900/90 border border-stone-800 rounded-lg p-3 shadow-sm backdrop-blur-xs space-y-2.5">
@@ -89,21 +91,30 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             </div>
           )}
           {gameStatus === 'checkmate' && (
-            <div className="flex items-center gap-1 px-2.5 py-0.5 bg-amber-950/90 border border-amber-500 rounded text-amber-300 text-xs font-bold">
+            <button
+              onClick={onOpenGameOverModal}
+              className="flex items-center gap-1 px-2.5 py-0.5 bg-amber-950/90 border border-amber-500 rounded text-amber-300 text-xs font-bold hover:bg-amber-900 transition-colors shadow-sm cursor-pointer"
+            >
               <Trophy size={12} className="text-amber-400" />
-              <span>绝杀！{winner === 'red' ? '红方胜' : '黑方胜'}</span>
-            </div>
+              <span>绝杀！{winner === 'red' ? '红方胜' : '黑方胜'} (查看结算)</span>
+            </button>
           )}
           {gameStatus === 'stalemate' && (
-            <div className="flex items-center gap-1 px-2.5 py-0.5 bg-stone-800 border border-stone-600 rounded text-stone-300 text-xs font-bold">
+            <button
+              onClick={onOpenGameOverModal}
+              className="flex items-center gap-1 px-2.5 py-0.5 bg-stone-800 border border-stone-600 rounded text-stone-300 text-xs font-bold hover:bg-stone-700 transition-colors shadow-sm cursor-pointer"
+            >
               <AlertTriangle size={12} />
-              <span>困毙！{winner === 'red' ? '红方胜' : '黑方胜'}</span>
-            </div>
+              <span>困毙！{winner === 'red' ? '红方胜' : '黑方胜'} (查看结算)</span>
+            </button>
           )}
           {gameStatus === 'conceded' && (
-            <div className="flex items-center gap-1 px-2.5 py-0.5 bg-stone-800 border border-stone-600 rounded text-stone-300 text-xs font-bold">
-              <span>认输！{winner === 'red' ? '红方胜' : '黑方胜'}</span>
-            </div>
+            <button
+              onClick={onOpenGameOverModal}
+              className="flex items-center gap-1 px-2.5 py-0.5 bg-stone-800 border border-stone-600 rounded text-stone-300 text-xs font-bold hover:bg-stone-700 transition-colors shadow-sm cursor-pointer"
+            >
+              <span>认输！{winner === 'red' ? '红方胜' : '黑方胜'} (查看结算)</span>
+            </button>
           )}
           {gameStatus === 'playing' && (
             <div className="flex items-center gap-1.5 text-xs font-medium">

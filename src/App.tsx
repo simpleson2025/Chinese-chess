@@ -27,6 +27,7 @@ import { ControlPanel } from './components/ControlPanel';
 import { MoveHistory } from './components/MoveHistory';
 import { RulesModal } from './components/RulesModal';
 import { AIAnalysisModal } from './components/AIAnalysisModal';
+import { GameOverModal } from './components/GameOverModal';
 import { Trophy, RefreshCw, Swords } from 'lucide-react';
 
 export default function App() {
@@ -64,6 +65,7 @@ export default function App() {
   const [isAnalysisOpen, setIsAnalysisOpen] = useState<boolean>(false);
   const [isAnalysisLoading, setIsAnalysisLoading] = useState<boolean>(false);
   const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const [isGameOverOpen, setIsGameOverOpen] = useState<boolean>(false);
 
   // Ref to prevent race conditions during AI turns
   const isAiWorkingRef = useRef(false);
@@ -93,6 +95,7 @@ export default function App() {
     setInCheckColor(null);
     setCapturedRed([]);
     setCapturedBlack([]);
+    setIsGameOverOpen(false);
     isAiWorkingRef.current = false;
   }, []);
 
@@ -138,6 +141,7 @@ export default function App() {
           nextGameStatus = 'checkmate';
           nextWinner = movingPiece.color;
           sounds.playVictory();
+          setTimeout(() => setIsGameOverOpen(true), 400);
         } else {
           nextGameStatus = 'check';
           sounds.playCheck();
@@ -148,6 +152,7 @@ export default function App() {
           nextGameStatus = 'stalemate';
           nextWinner = movingPiece.color;
           sounds.playVictory();
+          setTimeout(() => setIsGameOverOpen(true), 400);
         } else {
           nextGameStatus = 'playing';
         }
@@ -243,6 +248,7 @@ export default function App() {
             setGameStatus(inCheck ? 'checkmate' : 'stalemate');
             setWinner('red');
             sounds.playVictory();
+            setTimeout(() => setIsGameOverOpen(true), 400);
           }
         } finally {
           setIsAiThinking(false);
@@ -294,6 +300,7 @@ export default function App() {
       setWinner(null);
       setInCheckColor(isKingInCheck(restoredBoard, 'red') ? 'red' : null);
       setCurrentMoveIndex(-1);
+      setIsGameOverOpen(false);
     } else {
       // In PvP, undo 1 step
       const targetIndex = history.length - 1;
@@ -346,6 +353,7 @@ export default function App() {
     setGameStatus('conceded');
     setWinner(oppWinner);
     sounds.playVictory();
+    setTimeout(() => setIsGameOverOpen(true), 350);
   };
 
   // Jump to historic move
@@ -529,6 +537,7 @@ export default function App() {
             capturedRed={capturedRed}
             capturedBlack={capturedBlack}
             moveCount={history.length}
+            onOpenGameOverModal={() => setIsGameOverOpen(true)}
           />
 
           {/* Game Controls Panel (Mode, difficulty, undo, hint, flip, restart) */}
@@ -581,6 +590,24 @@ export default function App() {
         analysis={analysisData}
         onClose={() => setIsAnalysisOpen(false)}
         onReAnalyze={handleOpenAnalysis}
+      />
+
+      {/* Game Over Outcome Modal */}
+      <GameOverModal
+        isOpen={isGameOverOpen}
+        winner={winner}
+        gameStatus={gameStatus}
+        gameMode={gameMode}
+        aiDifficulty={aiDifficulty}
+        moveCount={history.length}
+        capturedRedCount={capturedBlack.length}
+        capturedBlackCount={capturedRed.length}
+        onRestart={handleRestart}
+        onClose={() => setIsGameOverOpen(false)}
+        onOpenAnalysis={() => {
+          setIsGameOverOpen(false);
+          handleOpenAnalysis();
+        }}
       />
     </div>
   );
