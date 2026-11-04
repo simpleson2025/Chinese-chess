@@ -29,18 +29,24 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [boardWidth, setBoardWidth] = useState(480);
 
-  // Responsive board sizing
+  // Responsive board sizing - maximizes board area, especially in side-by-side desktop layout
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
+        const isDesktop = window.innerWidth >= 1024;
         const parentW = containerRef.current.parentElement?.clientWidth || window.innerWidth;
-        const parentH = window.innerHeight - 220; // Leave room for HUD and controls
-        // Width to Height ratio of 9x10 grid: 8 grid steps width by 9 grid steps height
-        // Ratio is roughly 8 / 9 = 0.888
-        const maxAvailableW = Math.min(parentW - 24, 560);
-        const maxAvailableH = parentH;
-        const calculatedW = Math.min(maxAvailableW, maxAvailableH * (8 / 9.5));
-        setBoardWidth(Math.max(300, Math.floor(calculatedW)));
+        // On desktop, the board sits in its own left column with only the top header above
+        const parentH = isDesktop ? window.innerHeight - 100 : window.innerHeight - 340;
+        
+        // Upper bound on desktop allows board to expand up to 750px width
+        const maxAvailableW = isDesktop 
+          ? Math.min(parentW - 16, 750) 
+          : Math.min(parentW - 16, 520);
+        const maxAvailableH = Math.max(300, parentH);
+        
+        // Xiangqi grid aspect ratio is 8 columns span / 9 rows span (~0.888)
+        const calculatedW = Math.min(maxAvailableW, maxAvailableH * (8 / 9.3));
+        setBoardWidth(Math.max(290, Math.floor(calculatedW)));
       }
     };
 
@@ -51,15 +57,15 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
 
   // Board dimensions
   // Standard grid: 8 horizontal intervals, 9 vertical intervals
-  // Total margin around grid: 1/2 cell padding
-  const paddingX = boardWidth * 0.06;
-  const paddingY = boardWidth * 0.06;
+  const paddingX = boardWidth * 0.055;
+  const paddingY = boardWidth * 0.055;
   const gridW = boardWidth - paddingX * 2;
   const cellW = gridW / 8;
   const cellH = cellW; // square cells
   const gridH = cellH * 9;
   const boardHeight = gridH + paddingY * 2;
-  const pieceSize = Math.max(28, Math.min(56, Math.floor(cellW * 0.92)));
+  // Scalable piece size up to 74px on large boards
+  const pieceSize = Math.max(28, Math.min(74, Math.floor(cellW * 0.92)));
 
   // Coordinate mapping depending on flipped state
   const getDisplayCoords = (r: number, c: number) => {

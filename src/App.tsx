@@ -484,78 +484,83 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Chess Arena */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-2 sm:p-4 flex flex-col items-center justify-center">
-        {/* Game HUD (Turn, timers, captured pieces) */}
-        <GameHUD
-          turn={turn}
-          gameMode={gameMode}
-          aiDifficulty={aiDifficulty}
-          gameStatus={gameStatus}
-          winner={winner}
-          isAiThinking={isAiThinking}
-          capturedRed={capturedRed}
-          capturedBlack={capturedBlack}
-          moveCount={history.length}
-        />
+      {/* Main Chess Arena - 2-Column Split: Board on Left, Info & Controls on Right */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 lg:p-5 flex flex-col lg:flex-row items-center lg:items-start justify-center gap-5 xl:gap-8">
+        {/* Left Column: Maximized Chess Board Arena */}
+        <div className="flex-1 w-full flex items-center justify-center min-w-0">
+          <div className="relative w-full flex items-center justify-center">
+            <ChessBoard
+              board={displayBoard}
+              selectedCoord={currentMoveIndex === -1 ? selectedCoord : null}
+              legalMoves={currentMoveIndex === -1 ? legalMoves : []}
+              lastMove={lastMove}
+              hintMove={hintMove}
+              inCheckColor={inCheckColor}
+              flipped={isFlipped}
+              onSquareClick={handleSquareClick}
+              disabled={currentMoveIndex !== -1}
+            />
 
-        {/* Main Chess Board */}
-        <div className="relative">
-          <ChessBoard
-            board={displayBoard}
-            selectedCoord={currentMoveIndex === -1 ? selectedCoord : null}
-            legalMoves={currentMoveIndex === -1 ? legalMoves : []}
-            lastMove={lastMove}
-            hintMove={hintMove}
-            inCheckColor={inCheckColor}
-            flipped={isFlipped}
-            onSquareClick={handleSquareClick}
-            disabled={currentMoveIndex !== -1}
-          />
-
-          {/* Historical Review Floating Banner */}
-          {currentMoveIndex !== -1 && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-stone-900/95 border border-amber-600/80 px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-medium text-amber-300 z-40 backdrop-blur-md">
-              <span>正在复盘第 {currentMoveIndex + 1} 着</span>
-              <button
-                onClick={() => setCurrentMoveIndex(-1)}
-                className="underline hover:text-white font-bold ml-1 text-xs"
-              >
-                返回当前对局
-              </button>
-            </div>
-          )}
+            {/* Historical Review Floating Banner */}
+            {currentMoveIndex !== -1 && (
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-stone-900/95 border border-amber-600/80 px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2 text-xs font-medium text-amber-300 z-40 backdrop-blur-md">
+                <span>正在复盘第 {currentMoveIndex + 1} 着</span>
+                <button
+                  onClick={() => setCurrentMoveIndex(-1)}
+                  className="underline hover:text-white font-bold ml-1 text-xs"
+                >
+                  返回当前对局
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Game Controls Panel (Mode, difficulty, undo, hint, flip, restart) */}
-        <ControlPanel
-          gameMode={gameMode}
-          aiDifficulty={aiDifficulty}
-          soundEnabled={soundEnabled}
-          canUndo={history.length > 0 && currentMoveIndex === -1}
-          isAiThinking={isAiThinking}
-          isFlipped={isFlipped}
-          onSetGameMode={(m) => {
-            setGameMode(m);
-            handleRestart();
-          }}
-          onSetDifficulty={(d) => setAiDifficulty(d)}
-          onUndo={handleUndo}
-          onHint={handleHint}
-          onFlipBoard={() => setIsFlipped((prev) => !prev)}
-          onRestart={handleRestart}
-          onResign={handleResign}
-          onToggleSound={handleToggleSound}
-          onOpenRules={() => setIsRulesOpen(true)}
-          onOpenAnalysis={handleOpenAnalysis}
-        />
+        {/* Right Column: Game Information, Controls, and Move History */}
+        <aside className="w-full lg:w-[400px] xl:w-[440px] flex flex-col gap-3 shrink-0">
+          {/* Game HUD (Opponent, Turn status, Captured pieces) */}
+          <GameHUD
+            turn={turn}
+            gameMode={gameMode}
+            aiDifficulty={aiDifficulty}
+            gameStatus={gameStatus}
+            winner={winner}
+            isAiThinking={isAiThinking}
+            capturedRed={capturedRed}
+            capturedBlack={capturedBlack}
+            moveCount={history.length}
+          />
 
-        {/* Traditional Move Notation History */}
-        <MoveHistory
-          history={history}
-          currentMoveIndex={currentMoveIndex}
-          onJumpToMove={handleJumpToMove}
-        />
+          {/* Game Controls Panel (Mode, difficulty, undo, hint, flip, restart) */}
+          <ControlPanel
+            gameMode={gameMode}
+            aiDifficulty={aiDifficulty}
+            soundEnabled={soundEnabled}
+            canUndo={history.length > 0 && currentMoveIndex === -1}
+            isAiThinking={isAiThinking}
+            isFlipped={isFlipped}
+            onSetGameMode={(m) => {
+              setGameMode(m);
+              handleRestart();
+            }}
+            onSetDifficulty={(d) => setAiDifficulty(d)}
+            onUndo={handleUndo}
+            onHint={handleHint}
+            onFlipBoard={() => setIsFlipped((prev) => !prev)}
+            onRestart={handleRestart}
+            onResign={handleResign}
+            onToggleSound={handleToggleSound}
+            onOpenRules={() => setIsRulesOpen(true)}
+            onOpenAnalysis={handleOpenAnalysis}
+          />
+
+          {/* Traditional Move Notation History */}
+          <MoveHistory
+            history={history}
+            currentMoveIndex={currentMoveIndex}
+            onJumpToMove={handleJumpToMove}
+          />
+        </aside>
       </main>
 
       {/* Footer */}
