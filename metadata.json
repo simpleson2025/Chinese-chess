@@ -1,0 +1,8 @@
+{
+  "name": "华夏象棋 - 中国象棋对战平台",
+  "description": "典雅精致的中国象棋对战平台，支持人机对战（多级难度与智能引擎）、双人同屏对战、走子音效、悔棋复盘及棋圣AI局势解说。",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
